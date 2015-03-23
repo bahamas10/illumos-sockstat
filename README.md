@@ -253,8 +253,16 @@ Issues
 
 These are known issues with `sockstat` that *should* be fixed
 
-- must compile with `-DNDEBUG`, otherwise assertions fail
+- must compile with `-DNDEBUG`, otherwise assertions fail in `mib.c`
 - `-u` option - Unix domain socket support
+- `-z` and `-Z` don't work as expected
+    - `/dev/arp` seems to only list the current zone, and opening `/zones/*/root/dev/arp` seems no different
+    - the solution here is to zlogin (or similar) and get the information that way (maybe?)
+
+These are known issues with `sockstat` that are by design
+
+- inaccuracy - this program shows the process that created the socket, not necessary the process
+(or processes) that hold the socket open now
 
 License
 -------
