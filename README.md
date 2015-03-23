@@ -261,8 +261,8 @@ These are known issues with `sockstat` that *should* be fixed
 
 These are known issues with `sockstat` that are by design
 
-- inaccuracy - this program shows the process that created the socket, not necessary the process
-(or processes) that hold the socket open now
+- inaccuracy - this program shows the process that created the socket, not
+  necessarily the process (or processes) that hold the socket open now
 
 License
 -------
