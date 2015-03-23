@@ -2,7 +2,7 @@ CC ?= cc
 CFLAGS = -Wall -DNDEBUG
 
 sockstat: sockstat.c mib.o proc_info.o
-	$(CC) $(CFLAGS) -lproc -lsocket -lnsl $^ -o $@
+	$(CC) $(CFLAGS) -lzonecfg -lproc -lsocket -lnsl $^ -o $@
 
 mib.o: mib.c mib.h
 	$(CC) $(CFLAGS) -c $< -o $@

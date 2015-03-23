@@ -53,8 +53,9 @@
  *
  * pass in opts like mibopen({"arp", "tcp", "udp", NULL})
  */
-int mibopen(char **opts) {
-	int sd = sd = open("/dev/arp", O_RDWR);
+int mibopen(char *dev_arp, char **opts) {
+	printf("open = %s\n", dev_arp);
+	int sd = sd = open(dev_arp, O_RDWR);
 	if (sd == -1)
 		return -1;
 

@@ -51,7 +51,7 @@ typedef struct mib_item_s {
 	void			*valp;
 } mib_item_t;
 
-int mibopen(char **opts);
+int mibopen(char *dev_arp, char **opts);
 mib_item_t *mibget(int sd);
 void mibfree(mib_item_t *firstitem);
 void mib_get_constants(mib_item_t *item);
