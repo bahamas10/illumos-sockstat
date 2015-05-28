@@ -263,6 +263,7 @@ These are known issues with `sockstat` that are by design
 
 - inaccuracy - this program shows the process that created the socket, not
   necessarily the process (or processes) that hold the socket open now
+    - https://gist.github.com/bahamas10/8b98d48a3e8656c8b826
 
 License
 -------
