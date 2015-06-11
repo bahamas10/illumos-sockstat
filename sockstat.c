@@ -10,6 +10,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,6 +18,7 @@
 #include <zone.h>
 
 #include <procfs.h>
+#include <libzonecfg.h>
 
 #include <arpa/inet.h>
 
@@ -55,6 +57,7 @@ struct {
 	unsigned int zones : 1;       // -Z
 
 	zoneid_t zone;                // -z
+	char zroot[PATH_MAX];
 } opts;
 
 // print the usage message
@@ -98,6 +101,8 @@ static void parse_protocols(char *protocols) {
 }
 
 int main(int argc, char **argv) {
+	char dev_arp[PATH_MAX];
+
 	// defaults
 	opts.header = 1;
 	opts.loopback = 1;
@@ -141,6 +146,10 @@ int main(int argc, char **argv) {
 					    optarg, strerror(errno));
 					return 1;
 				}
+				if (zone_get_rootpath(optarg, opts.zroot, sizeof (opts.zroot)) != Z_OK) {
+					fprintf(stderr, "failed to get root path for %s\n", optarg);
+					return 1;
+				}
 				break;
 			case 'Z':
 				opts.zones = 1;
@@ -170,9 +179,18 @@ int main(int argc, char **argv) {
 		    opts.args ? "ARGS" : "");
 	}
 
+	// construct /dev/arp file name
+	dev_arp[0] = '\0';
+	int index = 0;
+	if (opts.zone >= 0) {
+		strncat(dev_arp, opts.zroot, sizeof (dev_arp));
+		index += strlen(opts.zroot);
+	}
+	strncat(dev_arp, "/dev/arp", sizeof (dev_arp) - index);
 	// open /dev/arp
+	printf("dev_arp = '%s'\n", dev_arp);
 	char *mib_opts[] = {"tcp", "udp", NULL};
-	int sd = mibopen(mib_opts);
+	int sd = mibopen(dev_arp, mib_opts);
 	if (sd == -1) {
 		perror("mibopen");
 		return 1;
@@ -185,6 +203,7 @@ int main(int argc, char **argv) {
 		perror("mibget");
 		return 1;
 	}
+	close(sd);
 
 	// load up constant values
 	mib_get_constants(item);
@@ -331,14 +350,6 @@ static void print_line(int af, char *proto, int pid, void *lip, uint_t lport, vo
 		if (info->name)
 			user = info->name;
 		// TODO else set the user string to the UID
-	}
-
-	if (opts.zone >= 0) {
-		// stop if we don't have psinfo
-		if (!info)
-			return;
-		if (info->psinfo->pr_zoneid != opts.zone)
-			return;
 	}
 
 	// format ip:port strings
